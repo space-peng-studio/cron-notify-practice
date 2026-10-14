@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { congratsEmail } from "@/lib/congratsEmail";
 
 // 還沒在 Resend 驗證自己的網域前，只能用 Resend 提供的測試寄件地址
 const FROM = "Cron Notify <onboarding@resend.dev>";
@@ -17,12 +18,14 @@ export async function sendNotifyEmail(): Promise<SendResult> {
   }
 
   const now = new Date().toLocaleString("zh-TW", { timeZone: "Asia/Taipei" });
+  const { subject, html, text } = congratsEmail(now);
   const resend = new Resend(apiKey);
   const { data, error } = await resend.emails.send({
     from: FROM,
     to: TO,
-    subject: `Cron 通知：${now}`,
-    text: `這是一封由 cron-notify-practice 寄出的通知信。\n\n觸發時間：${now}`,
+    subject,
+    html,
+    text,
   });
 
   if (error) {
